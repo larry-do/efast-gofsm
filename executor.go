@@ -1,11 +1,9 @@
 package statemachine
 
 import (
-	"fmt"
-	"log"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
-
-type EventType string
 
 type EventContext interface {
 	GetData() string
@@ -16,27 +14,27 @@ type Handler interface {
 }
 
 type StateTransition struct {
-	fromState StateType
-	eventName EventType
-	toState   StateType
+	fromState string
+	eventName string
+	toState   string
 	handler   Handler
 }
 
-func NewStateTransition(fromState StateType, eventName EventType, toState StateType, handler Handler) *StateTransition {
+func NewStateTransition(fromState string, eventName string, toState string, handler Handler) *StateTransition {
 	if &fromState == nil || len(fromState) < 1 {
-		log.Println("fromState empty")
+		log.Error().Msg("fromState empty")
 		return nil
 	}
 	if &eventName == nil || len(eventName) < 1 {
-		log.Println("eventName empty")
+		log.Error().Msg("eventName empty")
 		return nil
 	}
 	if &toState == nil || len(toState) < 1 {
-		log.Println("toState empty")
+		log.Error().Msg("toState empty")
 		return nil
 	}
 	if &handler == nil {
-		log.Println("handler empty")
+		log.Error().Msg("handler empty")
 		return nil
 	}
 
@@ -49,16 +47,16 @@ func NewStateTransition(fromState StateType, eventName EventType, toState StateT
 }
 
 type Executor struct {
-	stateEventConfigs map[StateType]map[EventType]*StateTransition
+	stateEventConfigs map[string]map[string]*StateTransition
 }
 
 func NewExecutor(transitions ...*StateTransition) *Executor {
-	stateEventConfigs := make(map[StateType]map[EventType]*StateTransition)
+	stateEventConfigs := make(map[string]map[string]*StateTransition)
 	for i := 0; i < len(transitions); i++ {
-		var eventTransitions map[EventType]*StateTransition
+		var eventTransitions map[string]*StateTransition
 		var ok bool
 		if eventTransitions, ok = stateEventConfigs[transitions[i].fromState]; !ok {
-			eventTransitions = make(map[EventType]*StateTransition)
+			eventTransitions = make(map[string]*StateTransition)
 			stateEventConfigs[transitions[i].fromState] = eventTransitions
 		}
 		eventTransitions[transitions[i].eventName] = transitions[i]
@@ -69,11 +67,11 @@ func NewExecutor(transitions ...*StateTransition) *Executor {
 	}
 }
 
-func (executor *Executor) getStateTransition(fromState StateType, event EventType) (*StateTransition, error) {
+func (executor *Executor) getStateTransition(fromState string, event string) (*StateTransition, error) {
 	if ss, ok := executor.stateEventConfigs[fromState]; ok {
 		if sss, oke := ss[event]; oke {
 			return sss, nil
 		}
 	}
-	return nil, fmt.Errorf("not accept event %s at state %s", event, fromState)
+	return nil, errors.Errorf("not accept event %s at state %s", event, fromState)
 }

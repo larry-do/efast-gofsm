@@ -1,7 +1,7 @@
 package trafficlight
 
 import (
-	"fmt"
+	"github.com/rs/zerolog/log"
 	"statemachine"
 )
 
@@ -10,7 +10,7 @@ type SwitchOffTransitionHandler struct {
 }
 
 func (t *SwitchOffTransitionHandler) Execute(eventCtx statemachine.EventContext) {
-	fmt.Printf("The light has been switched off. Data %s", eventCtx.GetData())
+	log.Info().Msgf("The light has been switched off. Data %s\n", eventCtx.GetData())
 }
 
 type SwitchOnTransitionHandler struct {
@@ -18,7 +18,7 @@ type SwitchOnTransitionHandler struct {
 }
 
 func (t *SwitchOnTransitionHandler) Execute(eventCtx statemachine.EventContext) {
-	fmt.Printf("The light has been switched on. Data %s", eventCtx.GetData())
+	log.Info().Msgf("The light has been switched on. Data %s\n", eventCtx.GetData())
 }
 
 type EventCtx struct {

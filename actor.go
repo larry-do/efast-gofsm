@@ -2,33 +2,31 @@ package statemachine
 
 import (
 	"github.com/google/uuid"
-	"log"
+	"github.com/rs/zerolog/log"
 	"sync"
 )
 
 const UnknownState = "UNKNOWN"
 
-type StateType string
-
 type IActor interface {
-	GetCurrentState() StateType
+	GetCurrentState() string
 
-	setCurrentState(state StateType)
+	setCurrentState(state string)
 
-	FireEvent(event EventType, eventCtx EventContext)
+	FireEvent(event string, eventCtx EventContext)
 }
 
 type Actor struct {
 	iactor       IActor
 	mutex        sync.Mutex
 	id           string
-	currentState StateType
+	currentState string
 	executor     *Executor
 }
 
 func NewActor(executor *Executor) *Actor {
 	if executor == nil {
-		log.Println("executor null")
+		log.Error().Msg("executor null")
 		return nil
 	}
 	var actor = Actor{
@@ -39,22 +37,28 @@ func NewActor(executor *Executor) *Actor {
 	return &actor
 }
 
-func (actor *Actor) GetCurrentState() StateType {
+func (actor *Actor) GetCurrentState() string {
 	return actor.currentState
 }
 
-func (actor *Actor) setCurrentState(newState StateType) {
-	log.Printf("changed state from %s to %s", actor.currentState, newState)
+func (actor *Actor) setCurrentState(newState string) {
+	log.Info().Str("actor_id", actor.id).
+		Str("previous_state", actor.currentState).
+		Str("new_state", newState).
+		Msg("Actor %s changed state from %s to %s\n")
 	actor.currentState = newState
 }
 
-func (actor *Actor) FireEvent(event EventType, eventCtx EventContext) {
+func (actor *Actor) FireEvent(event string, eventCtx EventContext) {
 	actor.mutex.Lock()
 	defer actor.mutex.Unlock()
 
 	transition, err := actor.executor.getStateTransition(actor.currentState, event)
 	if err != nil {
-		log.Println(err)
+		log.Error().Stack().Err(err).
+			Str("actor_id", actor.id).
+			Str("current_state", actor.currentState).
+			Msg("Caught error")
 		return
 	}
 
