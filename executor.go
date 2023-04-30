@@ -6,7 +6,16 @@ import (
 )
 
 type EventContext interface {
-	GetData() string
+	GetData() any
+}
+
+type EventCtx struct {
+	EventContext
+	Data any
+}
+
+func (e *EventCtx) GetData() any {
+	return e.Data
 }
 
 type Handler interface {

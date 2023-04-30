@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
 	"os"
+	"statemachine"
 	"statemachine/trafficlight"
 	"strings"
 	"time"
@@ -17,8 +18,10 @@ func main() {
 	configLogging(true)
 
 	trafficlight.TrafficLight.FireEvent("START", nil)
-	trafficlight.TrafficLight.FireEvent("SWITCH_ON", &trafficlight.EventCtx{Data: "Turn on"})
-	trafficlight.TrafficLight.FireEvent("SWITCH_OFFv", &trafficlight.EventCtx{Data: "Turn off"})
+	trafficlight.TrafficLight.FireEvent("SWITCH_ON", &statemachine.EventCtx{Data: "Turn on"})
+	trafficlight.TrafficLight.FireEvent("SWITCH_OFF", &statemachine.EventCtx{Data: 1})
+	trafficlight.TrafficLight.FireEvent("SWITCH_ON", &statemachine.EventCtx{Data: 2})
+	trafficlight.TrafficLight.FireEvent("SWITCH_ON", &statemachine.EventCtx{Data: 3})
 }
 
 func configLogging(console bool) {

@@ -10,7 +10,7 @@ type SwitchOffTransitionHandler struct {
 }
 
 func (t *SwitchOffTransitionHandler) Execute(eventCtx statemachine.EventContext) {
-	log.Info().Msgf("The light has been switched off. Data %s\n", eventCtx.GetData())
+	log.Info().Any("data", eventCtx.GetData()).Msg("The light has been switched off.")
 }
 
 type SwitchOnTransitionHandler struct {
@@ -18,16 +18,7 @@ type SwitchOnTransitionHandler struct {
 }
 
 func (t *SwitchOnTransitionHandler) Execute(eventCtx statemachine.EventContext) {
-	log.Info().Msgf("The light has been switched on. Data %s\n", eventCtx.GetData())
-}
-
-type EventCtx struct {
-	statemachine.EventContext
-	Data string
-}
-
-func (e *EventCtx) GetData() string {
-	return e.Data
+	log.Info().Any("data", eventCtx.GetData()).Msg("The light has been switched on.")
 }
 
 var (
