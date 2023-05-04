@@ -1,9 +1,8 @@
 package statemachine
 
 import (
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
-	"sync"
+	goLog "log"
 )
 
 const UnknownState = "UNKNOWN"
@@ -17,54 +16,58 @@ type IActor interface {
 }
 
 type Actor struct {
-	iactor       IActor
-	mutex        sync.Mutex
-	id           string
-	currentState string
-	executor     *Executor
+	iactor   IActor
+	id       string
+	Executor *Executor
 }
 
-func NewActor(executor *Executor) *Actor {
+func NewActor(executor *Executor, id string) *Actor {
 	if executor == nil {
 		log.Error().Msg("executor null")
 		return nil
 	}
 	var actor = Actor{
-		id:           uuid.New().String(),
-		currentState: UnknownState,
-		executor:     executor,
+		id:       id,
+		Executor: executor,
 	}
 	return &actor
 }
 
+func (actor *Actor) GetId() string {
+	return actor.id
+}
+
+func (actor *Actor) GetExecutor() *Executor {
+	return actor.Executor
+}
+
 func (actor *Actor) GetCurrentState() string {
-	return actor.currentState
+	goLog.Fatal("Not implemented GetCurrentState")
+	return UnknownState
 }
 
 func (actor *Actor) setCurrentState(newState string) {
-	log.Info().Str("actor_id", actor.id).
-		Str("previous_state", actor.currentState).
+	log.Info().Str("actor_id", actor.GetId()).
+		Str("previous_state", actor.GetCurrentState()).
 		Str("new_state", newState).
 		Msg("Actor %s changed state from %s to %s\n")
-	actor.currentState = newState
+
+	goLog.Fatal("Not implemented setCurrentState")
 }
 
 func (actor *Actor) FireEvent(event string, eventCtx EventContext) {
-	actor.mutex.Lock()
-	defer actor.mutex.Unlock()
-
-	transition, err := actor.executor.getStateTransition(actor.currentState, event)
+	transition, err := actor.Executor.GetStateTransition(actor.GetCurrentState(), event)
 	if err != nil {
 		log.Error().Stack().Err(err).
-			Str("actor_id", actor.id).
-			Str("current_state", actor.currentState).
+			Str("actor_id", actor.GetId()).
+			Str("current_state", actor.GetCurrentState()).
 			Msg("Caught error")
 		return
 	}
 
-	actor.setCurrentState(transition.toState)
+	actor.setCurrentState(transition.ToState)
 
-	if transition.handler != nil {
-		transition.handler.Execute(eventCtx)
+	if transition.Handler != nil {
+		transition.Handler.Execute(eventCtx)
 	}
 }

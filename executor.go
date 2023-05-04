@@ -23,10 +23,10 @@ type Handler interface {
 }
 
 type StateTransition struct {
-	fromState string
-	eventName string
-	toState   string
-	handler   Handler
+	FromState string
+	EventName string
+	ToState   string
+	Handler   Handler
 }
 
 func NewStateTransition(fromState string, eventName string, toState string, handler Handler) *StateTransition {
@@ -48,10 +48,10 @@ func NewStateTransition(fromState string, eventName string, toState string, hand
 	}
 
 	return &StateTransition{
-		fromState: fromState,
-		eventName: eventName,
-		toState:   toState,
-		handler:   handler,
+		FromState: fromState,
+		EventName: eventName,
+		ToState:   toState,
+		Handler:   handler,
 	}
 }
 
@@ -64,11 +64,11 @@ func NewExecutor(transitions ...*StateTransition) *Executor {
 	for i := 0; i < len(transitions); i++ {
 		var eventTransitions map[string]*StateTransition
 		var ok bool
-		if eventTransitions, ok = stateEventConfigs[transitions[i].fromState]; !ok {
+		if eventTransitions, ok = stateEventConfigs[transitions[i].FromState]; !ok {
 			eventTransitions = make(map[string]*StateTransition)
-			stateEventConfigs[transitions[i].fromState] = eventTransitions
+			stateEventConfigs[transitions[i].FromState] = eventTransitions
 		}
-		eventTransitions[transitions[i].eventName] = transitions[i]
+		eventTransitions[transitions[i].EventName] = transitions[i]
 	}
 
 	return &Executor{
@@ -76,7 +76,7 @@ func NewExecutor(transitions ...*StateTransition) *Executor {
 	}
 }
 
-func (executor *Executor) getStateTransition(fromState string, event string) (*StateTransition, error) {
+func (executor *Executor) GetStateTransition(fromState string, event string) (*StateTransition, error) {
 	if ss, ok := executor.stateEventConfigs[fromState]; ok {
 		if sss, oke := ss[event]; oke {
 			return sss, nil
