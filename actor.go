@@ -50,7 +50,7 @@ func (actor *Actor) setCurrentState(newState string) {
 	log.Info().Str("actor_id", actor.GetId()).
 		Str("previous_state", actor.GetCurrentState()).
 		Str("new_state", newState).
-		Msg("Actor %s changed state from %s to %s\n")
+		Msg("Actor state changed")
 
 	goLog.Fatal("Not implemented setCurrentState")
 }
