@@ -2,81 +2,30 @@ package statemachine
 
 import (
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
 
-type EventContext interface {
-	GetData() any
+type Executor[C EventContext] struct {
+	stateEventConfigs map[string]map[string]*StateTransition[C]
 }
 
-type EventCtx struct {
-	EventContext
-	Data any
-}
-
-func (e *EventCtx) GetData() any {
-	return e.Data
-}
-
-type Handler interface {
-	Execute(eventCtx EventContext)
-}
-
-type StateTransition struct {
-	FromState string
-	EventName string
-	ToState   string
-	Handler   Handler
-}
-
-func NewStateTransition(fromState string, eventName string, toState string, handler Handler) *StateTransition {
-	if &fromState == nil || len(fromState) < 1 {
-		log.Error().Msg("fromState empty")
-		return nil
-	}
-	if &eventName == nil || len(eventName) < 1 {
-		log.Error().Msg("eventName empty")
-		return nil
-	}
-	if &toState == nil || len(toState) < 1 {
-		log.Error().Msg("toState empty")
-		return nil
-	}
-	if &handler == nil {
-		log.Error().Msg("handler empty")
-		return nil
-	}
-
-	return &StateTransition{
-		FromState: fromState,
-		EventName: eventName,
-		ToState:   toState,
-		Handler:   handler,
-	}
-}
-
-type Executor struct {
-	stateEventConfigs map[string]map[string]*StateTransition
-}
-
-func NewExecutor(transitions ...*StateTransition) *Executor {
-	stateEventConfigs := make(map[string]map[string]*StateTransition)
+func NewExecutor[C EventContext](transitions ...*StateTransition[C]) *Executor[C] {
+	stateEventConfigs := make(map[string]map[string]*StateTransition[C])
 	for i := 0; i < len(transitions); i++ {
-		var eventTransitions map[string]*StateTransition
+		var eventTransitions map[string]*StateTransition[C]
 		var ok bool
 		if eventTransitions, ok = stateEventConfigs[transitions[i].FromState]; !ok {
-			eventTransitions = make(map[string]*StateTransition)
+			eventTransitions = make(map[string]*StateTransition[C])
 			stateEventConfigs[transitions[i].FromState] = eventTransitions
 		}
 		eventTransitions[transitions[i].EventName] = transitions[i]
 	}
 
-	return &Executor{
+	return &Executor[C]{
 		stateEventConfigs: stateEventConfigs,
 	}
 }
 
-func (executor *Executor) GetStateTransition(fromState string, event string) (*StateTransition, error) {
+func (executor *Executor[C]) GetStateTransition(fromState string, event string) (*StateTransition[C], error) {
 	if ss, ok := executor.stateEventConfigs[fromState]; ok {
 		if sss, oke := ss[event]; oke {
 			return sss, nil
