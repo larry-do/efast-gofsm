@@ -14,20 +14,20 @@ type StateTransition[C EventContext] struct {
 }
 
 func NewStateTransition[C EventContext](fromState string, eventName string, toState string, handler Handler[C]) *StateTransition[C] {
-	if &fromState == nil || len(fromState) < 1 {
-		log.Error().Msg("fromState empty")
+	if &fromState == nil {
+		log.Error().Msg("fromState nil")
 		return nil
 	}
 	if &eventName == nil || len(eventName) < 1 {
 		log.Error().Msg("eventName empty")
 		return nil
 	}
-	if &toState == nil || len(toState) < 1 {
-		log.Error().Msg("toState empty")
+	if &toState == nil {
+		log.Error().Msg("toState nil")
 		return nil
 	}
 	if &handler == nil {
-		log.Error().Msg("handler empty")
+		log.Error().Msg("handler nil")
 		return nil
 	}
 

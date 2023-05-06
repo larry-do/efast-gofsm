@@ -4,7 +4,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const UnknownState = "UNKNOWN"
+const (
+	StateUnknown   = "FSM_UNKNOWN"
+	StateAny       = "FSM_ANY"
+	StateKeepState = "FSM_KEEP_STATE"
+)
 
 type IActor[C EventContext] interface {
 	GetCurrentState() string
@@ -45,6 +49,9 @@ func (actor *Actor[C]) GetCurrentState() string {
 }
 
 func (actor *Actor[C]) setCurrentState(state string) {
+	if state == StateKeepState {
+		return
+	}
 	panic("Method setCurrentState not supported. Please implement it.")
 }
 
