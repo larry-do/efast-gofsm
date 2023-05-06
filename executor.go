@@ -1,4 +1,4 @@
-package statemachine
+package fsm
 
 import (
 	"github.com/pkg/errors"
