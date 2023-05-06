@@ -2,7 +2,6 @@ package statemachine
 
 import (
 	"github.com/rs/zerolog/log"
-	goLog "log"
 )
 
 const UnknownState = "UNKNOWN"
@@ -16,7 +15,7 @@ type IActor interface {
 }
 
 type Actor struct {
-	iactor   IActor
+	IActor
 	id       string
 	Executor *Executor
 }
@@ -42,17 +41,11 @@ func (actor *Actor) GetExecutor() *Executor {
 }
 
 func (actor *Actor) GetCurrentState() string {
-	goLog.Fatal("Not implemented GetCurrentState")
-	return UnknownState
+	panic("Method GetCurrentState not supported. Please implement it.")
 }
 
 func (actor *Actor) setCurrentState(newState string) {
-	log.Info().Str("actor_id", actor.GetId()).
-		Str("previous_state", actor.GetCurrentState()).
-		Str("new_state", newState).
-		Msg("Actor state changed")
-
-	goLog.Fatal("Not implemented setCurrentState")
+	panic("Method setCurrentState not supported. Please implement it.")
 }
 
 func (actor *Actor) FireEvent(event string, eventCtx EventContext) {
