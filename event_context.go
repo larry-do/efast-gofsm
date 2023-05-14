@@ -1,4 +1,4 @@
-package fsm
+package gofsm
 
 type EventContext interface {
 	GetData() any

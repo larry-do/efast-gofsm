@@ -1,4 +1,4 @@
-module fsm
+module gofsm
 
 go 1.20
 

@@ -1,4 +1,4 @@
-package fsm
+package gofsm
 
 import (
 	"github.com/pkg/errors"
